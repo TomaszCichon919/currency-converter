@@ -16,7 +16,7 @@ function App() {
   const [amount, setAmount] = useState(1);
   const [amountInFromCurrency, setAmountInFromCurrency] = useState (true);
   const [currencyData, setCurrencyData] = useState ('')
-  console.log('ff', currencyData.EUR);
+  console.log('ff', currencyData[toCurrency]);
   console.log('tocurrency', toCurrency);
   console.log('forcurrency', fromCurrency);
   console.log('amount', amount);
@@ -43,12 +43,12 @@ currencyCodes.push('PLN');
 currencyRates.push(1);
 //console.log('all', currencyCodes);
 
-const currencyData = {};
+const rawCurrencyData = {};
 
 for (let i = 0; i < currencyCodes.length && i < currencyRates.length; i++) {
-  currencyData[currencyCodes[i]] = currencyRates[i];
+  rawCurrencyData[currencyCodes[i]] = currencyRates[i];
 }
-setCurrencyData(currencyData)
+setCurrencyData(rawCurrencyData)
      setCurrencyOptions(currencyCodes);
      setFromCurrency('PLN')
      setToCurrency(EUR.code)
@@ -71,21 +71,22 @@ setCurrencyData(currencyData)
   }
   function handleToCurrencyChange (e) {
     setToCurrency(e.target.value)
-    setExchangeRate(currencyData.toCurrency)
+    //setExchangeRate(currencyData.toCurrency)
   }
   function handleFromCurrencyChange (e) {
     setFromCurrency(e.target.value)
-    setExchangeRate(currencyData.fromCurrency)
+    //setExchangeRate(currencyData.fromCurrency)
 
   }
-  console.log('money', exchangeRate)
+  //console.log('money', exchangeRate)
+  console.log("dla for", currencyData[fromCurrency])
   let toAmount, fromAmount
   if(amountInFromCurrency) {
     fromAmount = amount
-    toAmount = amount * exchangeRate
+    toAmount = amount * currencyData[fromCurrency]/currencyData[toCurrency]
   } else {
     toAmount = amount
-    fromAmount = amount/exchangeRate
+    fromAmount = amount * currencyData[toCurrency]/currencyData[fromCurrency]
   }
   return (
     <div>
