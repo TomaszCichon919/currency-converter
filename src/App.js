@@ -1,26 +1,41 @@
 import CurrencyRow from './components/CurrencyRow';
 import styles from './App.module.scss';
 import React, {useEffect, useState} from 'react';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import { FormControl } from 'react-bootstrap';
+import DatePicker from "react-datepicker";
+
+
+
 
 const BASE_URL= 'http://api.nbp.pl/api/exchangerates/tables/a/';
-//const API_KEY ='cd7d7cd0338884a126f823a389ba071c';
-//const READY_URL = BASE_URL?API_KEY;
+
+
 
 function App() {
 
+  
   const [currencyOptions, setCurrencyOptions] = useState([])
   //console.log('currency options', currencyOptions);
   const [fromCurrency, setFromCurrency] = useState('')
   const [toCurrency, setToCurrency] = useState('')
   const [exchangeRate, setExchangeRate] = useState()
   const [amount, setAmount] = useState(1);
+  const [hamount, setHamount] = useState('');
   const [amountInFromCurrency, setAmountInFromCurrency] = useState (true);
   const [currencyData, setCurrencyData] = useState ('')
+  const [publishedDate, setPublishedDate] = useState('2023-09-25');
+  const [fromCurrencyInPLN, setfromCurrencyInPLN] = useState ('')
+  const [toCurrencyInPLN, setToCurrencyInPLN] = useState ('')
   console.log('ff', currencyData[toCurrency]);
   console.log('tocurrency', toCurrency);
   console.log('forcurrency', fromCurrency);
   console.log('amount', amount);
 
+  const FROMCURRENCY_URL = 'http://api.nbp.pl/api/exchangerates/rates/a/'+{fromCurrency}+'/'+{publishedDate}+'/'
+  const TOCURRENCY_URL = 'http://api.nbp.pl/api/exchangerates/rates/a/'+{toCurrency}+'/'+{publishedDate}+'/'
+const getPath =(value) => 'http://api.nbp.pl/api/exchangerates/rates/a/'+{value}+'/'+{publishedDate}+'/'
   useEffect(()=> {
     fetch(BASE_URL)
     .then(res=> res.json())
@@ -57,8 +72,32 @@ setCurrencyData(rawCurrencyData)
 
    })
   }, [])
-  // console.log('to', toCurrency);
-  // console.log('form', fromCurrency);
+
+  useEffect(()=> {
+    fetch(FROMCURRENCY_URL )
+    .then(res=> res.json())
+    .then(data => 
+      {
+
+        setfromCurrencyInPLN(data)
+        console.log(fromCurrencyInPLN)
+        console.log(fromCurrency)
+   })
+  }, [fromCurrency])
+
+  useEffect(()=> {
+    fetch(TOCURRENCY_URL )
+    .then(res=> res.json())
+    .then(data => 
+      {
+
+        setToCurrencyInPLN(data)
+        console.log(toCurrencyInPLN)
+        console.log(fromCurrency)
+   })
+  }, [toCurrency])
+  console.log('to', toCurrency);
+  console.log('form', fromCurrency);
 
  function handleFromAmountChange (e) {
     setAmount(e.target.value)
@@ -88,6 +127,18 @@ setCurrencyData(rawCurrencyData)
     toAmount = amount
     fromAmount = amount * currencyData[toCurrency]/currencyData[fromCurrency]
   }
+  const handleDateChange = (date) => {
+    setPublishedDate(date);
+  }
+    const handleSubmit = e => {
+      e.preventDefault();
+  
+      
+      };
+
+    
+  
+  
   return (
     <div>
    <h1>Converter</h1>
@@ -106,6 +157,48 @@ setCurrencyData(rawCurrencyData)
    onChangeAmount = {handleToAmountChange}
    amount={toAmount}
    />
+   <h1>History data</h1>
+   <Form onSubmit={handleSubmit}>
+           
+
+      <Form.Group className="mb-3" controlId="published">
+        <Form.Label className="pb-2">Published</Form.Label>
+        <div>
+        <DatePicker selected={publishedDate}  dateFormat="yyyy-mm-dd" onChange={handleDateChange} />
+       
+        </div>
+      </Form.Group>
+
+      <Form.Group className="mb-3" controlId="author">
+        <Form.Label>Amount</Form.Label>
+        <Form.Control type="number" placeholder="Author" value={amount} onChange={e => setHamount(e.target.value)} />
+       
+      </Form.Group>
+
+      <Form.Group className="mb-3" controlId="category">
+        <Form.Label>From:</Form.Label>
+        <Form.Select value={fromCurrency} onChange={handleFromCurrencyChange}>
+        <option>Open this select menu</option>
+        {currencyOptions.map(option => ( <option key={option} value ={option}>{option}</option>
+      ))}
+    </Form.Select>
+      </Form.Group>
+
+      <Form.Group className="mb-3" controlId="category">
+        <Form.Label>To:</Form.Label>
+        <Form.Select value={toCurrency} onChange={handleToCurrencyChange}>
+        <option>Open this select menu</option>
+        {currencyOptions.map(option => ( <option key={option} value ={option}>{option}</option>
+      ))}
+    </Form.Select>
+      </Form.Group>
+    
+
+      <Button variant="primary" type="submit">
+     Submit
+      </Button>
+    </Form>
+
    </div>
   );
 }
